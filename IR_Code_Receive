@@ -14,6 +14,7 @@ void setup() {
   delay(2000); while (!Serial); //delay for Leonardo
   myReceiver.enableIRIn(); // Start the receiver
   Serial.println(F("Ready to receive IR signals"));
+  myReceiver.setFrameTimeout(100000);
 }
 
 void loop() {
