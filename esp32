@@ -1,0 +1,68 @@
+#include<WiFi.h>
+#include<WebServer.h>
+
+const char* ssid = "Esp Thien";
+const char* password = "123@thien";
+
+IPAddress local_ip(192,168,10,125);
+IPAddress gateway(192,168,10,1);
+IPAddress subnet(255,255,255,0);
+
+WebServer server(80);
+
+uint8_t LedPin = 8;
+bool LedStatus = LOW;
+
+void eventOnConnect(){
+  LedStatus = LOW;
+  Serial.println("Chan so 2 esp32 tat");
+  server.send(200,"text/html",HTMLGui(LedStatus));
+}
+
+void eventLedOn(){
+  LedStatus = HIGH;
+  Serial.println("Chan so 2 esp32 bat");
+  server.send(200,"text/html",HTMLGui(LedStatus));
+}
+
+void eventLedOff(){
+  LedStatus = LOW;
+  Serial.println("Chan so 2 esp32 tat");
+  server.send(200,"text/html",HTMLGui(LedStatus));
+}
+
+void eventNotFound(){
+  //LedStatus = LOW;
+  //Serial.println("Chan so 2 esp32 tat");
+  server.send(400,"text/html","Not Found");
+}
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(115200);
+  pinMode(LedPin, OUTPUT);
+
+  WiFi.softAP(ssid, password);
+  WiFi.softAPConfig(Local_ip, geteway, subnet);
+  delay(100);
+
+  server.on("/",eventOnConnect);
+  server.on("/ledOn",eventLedOn);
+  server.on("/LedOff",eventLedOff);
+  //server.on("/",eventOnConnect);
+  server.onNotFound(eventNotFound);
+  
+  server.begin();
+  Serial.println("Server is starting")
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  server.handleClient();
+  if(LedStatus){
+    digitalWrite(LedPin,1);
+  }
+  else{
+    digitalWrite(LedPin,0);
+  }
+}
